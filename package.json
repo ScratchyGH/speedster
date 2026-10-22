@@ -1,0 +1,19 @@
+{
+  "name": "speedster",
+  "version": "1.0.0",
+  "description": "Speedster — a browser-in-a-browser web proxy on Scramjet, libcurl and a Cloudflare Wisp server",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "dev": "node scripts/build.mjs && wrangler dev",
+    "deploy": "node scripts/build.mjs && wrangler deploy"
+  },
+  "author": "DeadByte",
+  "license": "AGPL-3.0-only",
+  "private": true,
+  "devDependencies": {
+    "@mercuryworkshop/bare-mux": "2.1.9",
+    "@mercuryworkshop/libcurl-transport": "1.5.2",
+    "@mercuryworkshop/scramjet": "1.1.0",
+    "wrangler": "^4.151.3"
+  }
+}
