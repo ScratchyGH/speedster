@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Speedster</title>
+<link rel="icon" id="favicon" href="icon.svg">
+<meta name="theme-color" content="#0b0d12">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="chrome">
+<div id="tabstrip">
+<div id="brand" title="Speedster"><img src="icon.svg" alt=""></div>
+<div id="tabs"></div>
+<button id="newtab-btn" class="icon-btn" title="New tab (Alt+T)"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+<div id="drag"></div>
+</div>
+<div id="toolbar">
+<button id="back" class="icon-btn" title="Back (Alt+Left)"><svg viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+<button id="forward" class="icon-btn" title="Forward (Alt+Right)"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+<button id="reload" class="icon-btn" title="Reload (Ctrl+R)"><svg class="reload-ico" viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/></svg><svg class="stop-ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+<button id="home" class="icon-btn" title="Home"><svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z"/></svg></button>
+<form id="omnibox" autocomplete="off">
+<span id="site-info" title="Connection"><svg id="lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><svg id="search-ico" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/></svg></span>
+<input id="address" spellcheck="false" placeholder="Search or enter address">
+<button type="button" id="star" class="icon-btn small" title="Bookmark this tab"><svg viewBox="0 0 24 24"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.8l-5.2 2.8 1-5.8-4.3-4.1 5.9-.8z"/></svg></button>
+<div id="suggest"></div>
+</form>
+<span id="wisp-dot" title="Wisp server"></span>
+<button id="menu-btn" class="icon-btn" title="Menu"><svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="12" cy="19" r="1.3"/></svg></button>
+<div id="menu">
+<button data-act="newtab"><span>New tab</span><kbd>Alt+T</kbd></button>
+<button data-act="dup"><span>Duplicate tab</span></button>
+<button data-act="reopen"><span>Reopen closed tab</span><kbd>Alt+Shift+T</kbd></button>
+<hr>
+<button data-act="blank"><span>Open in about:blank</span></button>
+<button data-act="fullscreen"><span>Fullscreen</span><kbd>F11</kbd></button>
+<button data-act="history"><span>History</span><kbd>Alt+H</kbd></button>
+<hr>
+<button data-act="settings"><span>Settings</span><kbd>Alt+,</kbd></button>
+</div>
+</div>
+<div id="bookmarks"></div>
+<div id="progress"><i></i></div>
+</div>
+<main id="views">
+<section id="newtab">
+<div class="nt-inner">
+<div class="nt-logo"><img src="icon.svg" alt=""><h1>Speedster</h1></div>
+<form id="nt-form" autocomplete="off"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/></svg><input id="nt-input" spellcheck="false" placeholder="Search the web or type a URL"></form>
+<div id="tiles"></div>
+<p id="nt-status"></p>
+</div>
+</section>
+<section id="history-page">
+<div class="hp-inner">
+<div class="hp-head"><h2>History</h2><input id="hp-filter" placeholder="Search history"><button id="hp-clear" class="btn ghost">Clear history</button></div>
+<div id="hp-list"></div>
+</div>
+</section>
+</main>
+<div id="modal-bg"></div>
+<div id="settings" class="modal">
+<div class="modal-head"><h2>Settings</h2><button class="icon-btn" data-close><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+<div class="modal-body">
+<label>Wisp server<input id="s-wisp" spellcheck="false" placeholder="wss://speedster.example.workers.dev/wisp/"></label>
+<p class="hint" id="s-wisp-status"></p>
+<label>Search engine<select id="s-engine">
+<option value="https://duckduckgo.com/?q=%s">DuckDuckGo</option>
+<option value="https://www.google.com/search?q=%s">Google</option>
+<option value="https://www.bing.com/search?q=%s">Bing</option>
+<option value="https://search.brave.com/search?q=%s">Brave Search</option>
+<option value="https://www.startpage.com/do/search?q=%s">Startpage</option>
+</select></label>
+<label>Tab cloak<select id="s-cloak">
+<option value="">None</option>
+<option value="Google Classroom|https://www.google.com/s2/favicons?domain=classroom.google.com&amp;sz=64">Google Classroom</option>
+<option value="My Drive - Google Drive|https://www.google.com/s2/favicons?domain=drive.google.com&amp;sz=64">Google Drive</option>
+<option value="Google Docs|https://www.google.com/s2/favicons?domain=docs.google.com&amp;sz=64">Google Docs</option>
+<option value="Home | Schoology|https://www.google.com/s2/favicons?domain=app.schoology.com&amp;sz=64">Schoology</option>
+<option value="Dashboard|https://www.google.com/s2/favicons?domain=instructure.com&amp;sz=64">Canvas</option>
+<option value="Khan Academy|https://www.google.com/s2/favicons?domain=khanacademy.org&amp;sz=64">Khan Academy</option>
+</select></label>
+<label>Panic key<input id="s-panic" maxlength="12" placeholder="Press a key" readonly></label>
+<label>Panic URL<input id="s-panic-url" spellcheck="false" placeholder="https://classroom.google.com"></label>
+<label class="check"><input type="checkbox" id="s-autoblank">Open in about:blank on launch</label>
+<label class="check"><input type="checkbox" id="s-bar">Show bookmarks bar</label>
+<div class="row"><button class="btn" id="s-save">Save</button><button class="btn ghost" id="s-reset">Reset browser data</button></div>
+</div>
+</div>
+<script src="config.js"></script>
+<script src="baremux/index.js"></script>
+<script src="scram/scramjet.all.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
