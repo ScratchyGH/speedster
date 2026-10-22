@@ -501,8 +501,8 @@ select(tabs[Math.min(Math.max(saved ? saved.active : 0, 0), tabs.length - 1)]);
 testWisp(wispUrl());
 if (!("serviceWorker" in navigator)) { toast("Service workers are unavailable in this browser"); return; }
 try {
-await navigator.serviceWorker.register(base + "sw.js", { scope: base });
 await scramjet.init();
+await navigator.serviceWorker.register(base + "sw.js", { scope: base });
 await navigator.serviceWorker.ready;
 await setTransport();
 } catch (e) {
