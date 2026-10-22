@@ -1,0 +1,17 @@
+import { cpSync, mkdirSync, rmSync, writeFileSync, copyFileSync } from "node:fs";
+import { forkScramjet } from "./fork.mjs";
+const mw = "node_modules/@mercuryworkshop/";
+rmSync("dist", { recursive: true, force: true });
+cpSync("public", "dist", { recursive: true });
+mkdirSync("dist/scram", { recursive: true });
+mkdirSync("dist/baremux", { recursive: true });
+mkdirSync("dist/libcurl", { recursive: true });
+for (const f of ["scramjet.all.js", "scramjet.sync.js", "scramjet.wasm.wasm"]) copyFileSync(mw + "scramjet/dist/" + f, "dist/scram/" + f);
+forkScramjet("dist/scram/scramjet.all.js");
+copyFileSync(mw + "bare-mux/dist/index.js", "dist/baremux/index.js");
+copyFileSync(mw + "bare-mux/dist/worker.js", "dist/baremux/worker.js");
+copyFileSync(mw + "libcurl-transport/dist/index.mjs", "dist/libcurl/index.mjs");
+const wisp = (process.env.WISP_URL || "").trim();
+writeFileSync("dist/config.js", "self.SPEEDSTER_WISP=" + JSON.stringify(wisp) + ";\n");
+writeFileSync("dist/.nojekyll", "");
+console.log("built dist" + (wisp ? " with wisp " + wisp : " (same-origin wisp)"));
