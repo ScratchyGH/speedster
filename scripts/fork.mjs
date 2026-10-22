@@ -10,7 +10,8 @@ const patches = [
 ["--accent: #ffa938;", "--accent: #ff4d5e;"],
 ["<li>Updating Scramjet</li>", "<li>Updating Speedster</li>"],
 ["https://github.com/MercuryWorkshop/scramjet", "https://github.com/ScratchyGH/speedster"],
-["<i>Scramjet v<span id=\"version\"></span>", "<i>Speedster engine v<span id=\"version\"></span>"]
+["<i>Scramjet v<span id=\"version\"></span>", "<i>Speedster engine v<span id=\"version\"></span>"],
+["\"$scramjet\",1", "\"$speedster\",1"]
 ];
 for (const [a, b] of patches) {
 if (!s.includes(a)) throw new Error("fork patch failed: " + a);
