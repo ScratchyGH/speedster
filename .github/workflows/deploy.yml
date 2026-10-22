@@ -1,0 +1,56 @@
+name: Deploy Speedster
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: speedster
+  cancel-in-progress: true
+jobs:
+  cloudflare:
+    runs-on: ubuntu-latest
+    outputs:
+      wisp: ${{ steps.deploy.outputs.wisp }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: node scripts/build.mjs
+      - id: deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then echo "No CLOUDFLARE_API_TOKEN secret, skipping Worker deploy"; exit 0; fi
+          npx wrangler deploy 2>&1 | tee deploy.log
+          host=$(grep -oE 'https://[a-z0-9.-]+\.workers\.dev' deploy.log | head -1 | sed 's#https://##')
+          if [ -n "$host" ]; then echo "wisp=wss://$host/wisp/" >> "$GITHUB_OUTPUT"; fi
+  pages:
+    needs: cloudflare
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.pages.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: node scripts/build.mjs
+        env:
+          WISP_URL: ${{ vars.WISP_URL || needs.cloudflare.outputs.wisp }}
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - id: pages
+        uses: actions/deploy-pages@v4
