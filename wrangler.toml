@@ -20,3 +20,4 @@ new_sqlite_classes = ["Wisp"]
 UPSTREAM_WISP = ""
 BLOCKED_HOSTS = ""
 ALLOW_PRIVATE = ""
+SHARDS = "16"

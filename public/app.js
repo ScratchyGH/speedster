@@ -16,7 +16,7 @@ const DEFAULT_TILES = [
 { title: "Twitch", url: "https://www.twitch.tv/" },
 { title: "Discord", url: "https://discord.com/app" }
 ];
-const settings = Object.assign({ wisp: "", engine: "https://duckduckgo.com/?q=%s", cloak: "", panic: "", panicUrl: "https://classroom.google.com/", autoblank: false, bar: true }, store.get("settings", {}));
+const settings = Object.assign({ wisp: "", engine: "https://duckduckgo.com/?q=%s", cloak: "", panic: "", panicUrl: "https://classroom.google.com/", autoblank: false, bar: true, mode: "auto", pool: 6 }, store.get("settings", {}));
 let tiles = store.get("tiles", DEFAULT_TILES);
 let bookmarks = store.get("bookmarks", []);
 let hist = store.get("history", []);
@@ -425,6 +425,8 @@ $("#s-panic").value = settings.panic;
 $("#s-panic-url").value = settings.panicUrl;
 $("#s-autoblank").checked = settings.autoblank;
 $("#s-bar").checked = settings.bar;
+$("#s-mode").value = settings.mode;
+$("#s-pool").value = String(settings.pool);
 $("#settings").classList.add("show");
 $("#modal-bg").classList.add("show");
 testWisp(wispUrl(), $("#s-wisp-status"));
@@ -436,7 +438,7 @@ $("#s-panic").addEventListener("keydown", e => { e.preventDefault(); e.stopPropa
 $("#s-wisp").addEventListener("change", () => testWisp($("#s-wisp").value.trim(), $("#s-wisp-status")));
 $("#s-save").onclick = async () => {
 const wisp = $("#s-wisp").value.trim();
-const changed = wisp !== wispUrl();
+const changed = wisp !== wispUrl() || $("#s-mode").value !== settings.mode || +$("#s-pool").value !== +settings.pool;
 settings.wisp = wisp === ((self.SPEEDSTER_WISP || "") || ((location.protocol === "https:" ? "wss://" : "ws://") + location.host + "/wisp/")) ? "" : wisp;
 settings.engine = $("#s-engine").value;
 settings.cloak = $("#s-cloak").value;
@@ -444,6 +446,8 @@ settings.panic = $("#s-panic").value;
 settings.panicUrl = $("#s-panic-url").value.trim() || "https://classroom.google.com/";
 settings.autoblank = $("#s-autoblank").checked;
 settings.bar = $("#s-bar").checked;
+settings.mode = $("#s-mode").value;
+settings.pool = +$("#s-pool").value || 6;
 store.set("settings", settings);
 applyCloak();
 renderBookmarks();
@@ -479,7 +483,7 @@ st.innerHTML = ok ? "Connected to <b>" + new URL(url.replace(/^ws/, "http")).hos
 try {
 ws = new WebSocket(url);
 ws.binaryType = "arraybuffer";
-ws.onmessage = e => { const v = new DataView(e.data); finish(v.getUint8(0) === 3, v.getUint8(0) === 3 ? "Connected · " + Math.round(performance.now() - started) + " ms · buffer " + v.getUint32(5, true) : "Not a Wisp server"); };
+ws.onmessage = e => { const v = new DataView(e.data); finish(v.getUint8(0) === 3, v.getUint8(0) === 3 ? "Connected · " + Math.round(performance.now() - started) + " ms · buffer " + v.getUint32(5, true) + " · " + ({ auto: "Auto", edge: "Edge", secure: "Secure" })[settings.mode] + " mode" : "Not a Wisp server"); };
 ws.onerror = () => finish(false, "Could not connect");
 ws.onclose = () => finish(false, "Connection closed");
 setTimeout(() => finish(false, "Timed out"), 6000);
@@ -487,7 +491,7 @@ setTimeout(() => finish(false, "Timed out"), 6000);
 }
 $("#wisp-dot").onclick = openSettings;
 async function setTransport() {
-await conn.setTransport(base + "libcurl/index.mjs", [{ wisp: wispUrl() }]);
+await conn.setTransport(base + "net.mjs", [{ wisp: wispUrl(), mode: settings.mode, pool: +settings.pool || 6, connections: [80, 60, 10] }]);
 }
 async function boot() {
 if (settings.autoblank && window.top === window && !location.hash.includes("noblank") && openBlank()) return;

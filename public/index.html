@@ -66,6 +66,18 @@
 <div class="modal-body">
 <label>Wisp server<input id="s-wisp" spellcheck="false" placeholder="wss://speedster.example.workers.dev/wisp/"></label>
 <p class="hint" id="s-wisp-status"></p>
+<label>Network mode<select id="s-mode">
+<option value="auto">Auto — edge network first, encrypted Wisp fallback</option>
+<option value="edge">Edge — fastest, everything through Cloudflare</option>
+<option value="secure">Secure — end-to-end TLS over Wisp only</option>
+</select></label>
+<label>Wisp connections<select id="s-pool">
+<option value="2">2</option>
+<option value="4">4</option>
+<option value="6">6</option>
+<option value="8">8</option>
+<option value="12">12</option>
+</select></label>
 <label>Search engine<select id="s-engine">
 <option value="https://duckduckgo.com/?q=%s">DuckDuckGo</option>
 <option value="https://www.google.com/search?q=%s">Google</option>

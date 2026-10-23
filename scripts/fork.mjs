@@ -23,3 +23,19 @@ s = "self.__spdUp=function(e){for(const n of[\"config\",\"cookies\",\"redirectTr
 s = s.replace(/\/\/# sourceMappingURL=.*$/m, "");
 writeFileSync(file, s);
 }
+export function poolLibcurl(file) {
+let s = readFileSync(file, "utf8");
+const patches = [
+["const _wisp_connections = {};", "const _wisp_connections = {};\nconst _spd_pick = base => { const n = Math.max(1, globalThis.SPD_POOL || 1); let best = base + \"#0\", load = Infinity; for (let i = 0; i < n; i++) { const k = base + \"#\" + i, c = _wisp_connections[k]; if (!c) return k; const l = Object.keys(c.active_streams || {}).length; if (l < load) { load = l; best = k; } } return best; };"],
+["this.real_url = url_split.join(\"/\") + \"/\";", "this.real_url = url_split.join(\"/\") + \"/\";\n      this.pool_key = _spd_pick(this.real_url);"],
+["this.connections = options.connections;", "this.connections = options.connections;\n    globalThis.SPD_POOL = options.pool || 1;"]
+];
+for (const [a, b] of patches) {
+if (s.split(a).length !== 2) throw new Error("libcurl pool patch failed: " + a);
+s = s.split(a).join(b);
+}
+const n = s.split("_wisp_connections[this.real_url]").length - 1;
+if (n !== 4) throw new Error("libcurl pool patch failed: connection map uses " + n);
+s = s.split("_wisp_connections[this.real_url]").join("_wisp_connections[this.pool_key]");
+writeFileSync(file, s);
+}

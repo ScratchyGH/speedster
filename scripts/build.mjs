@@ -1,5 +1,5 @@
-import { cpSync, mkdirSync, rmSync, writeFileSync, copyFileSync } from "node:fs";
-import { forkScramjet } from "./fork.mjs";
+import { cpSync, mkdirSync, rmSync, writeFileSync, copyFileSync, readFileSync } from "node:fs";
+import { forkScramjet, poolLibcurl } from "./fork.mjs";
 const mw = "node_modules/@mercuryworkshop/";
 rmSync("dist", { recursive: true, force: true });
 cpSync("public", "dist", { recursive: true });
@@ -11,7 +11,10 @@ forkScramjet("dist/scram/scramjet.all.js");
 copyFileSync(mw + "bare-mux/dist/index.js", "dist/baremux/index.js");
 copyFileSync(mw + "bare-mux/dist/worker.js", "dist/baremux/worker.js");
 copyFileSync(mw + "libcurl-transport/dist/index.mjs", "dist/libcurl/index.mjs");
+poolLibcurl("dist/libcurl/index.mjs");
 const wisp = (process.env.WISP_URL || "").trim();
 writeFileSync("dist/config.js", "self.SPEEDSTER_WISP=" + JSON.stringify(wisp) + ";\n");
 writeFileSync("dist/.nojekyll", "");
+const ver = Date.now().toString(36);
+writeFileSync("dist/sw.js", readFileSync("dist/sw.js", "utf8").replace("__SPD_BUILD__", ver));
 console.log("built dist" + (wisp ? " with wisp " + wisp : " (same-origin wisp)"));
